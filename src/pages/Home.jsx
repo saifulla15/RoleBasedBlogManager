@@ -4,14 +4,28 @@ import { Container, PostCard } from "../components";
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     appwriteService.getPosts().then((posts) => {
-      if (posts) {
+      if (posts && Array.isArray(posts.documents)) {
         setPosts(posts.documents);
+      } else {
+        setPosts([]); // fallback if undefined or invalid
       }
+      setLoading(false);
     });
   }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full py-8 mt-4 text-center">
+        <Container>
+          <h1 className="text-2xl font-semibold">Loading posts...</h1>
+        </Container>
+      </div>
+    );
+  }
 
   if (posts.length === 0) {
     return (
@@ -28,6 +42,7 @@ function Home() {
       </div>
     );
   }
+
   return (
     <div className="w-full py-8">
       <Container>
